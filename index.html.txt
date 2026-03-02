@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>JP Big Board — Best Available</title>
+  <style>
+    :root{
+      --bg:#0b0f16;
+      --panel:#111827;
+      --panel2:#0f172a;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --line:#243043;
+      --accent:#f59e0b;
+      --accent2:#60a5fa;
+      --good:#34d399;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:linear-gradient(180deg, var(--bg), #070a10);
+      color:var(--text);
+    }
+    header{
+      padding:22px 16px 14px;
+      border-bottom:1px solid var(--line);
+      background:rgba(17,24,39,.75);
+      backdrop-filter: blur(10px);
+      position:sticky; top:0; z-index:5;
+    }
+    .wrap{max-width:1100px; margin:0 auto;}
+    .topbar{
+      display:flex; gap:14px; align-items:flex-start; justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex; flex-direction:column; gap:4px;
+    }
+    .brand h1{
+      margin:0; font-size:18px; letter-spacing:.2px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .pill{
+      font-size:12px; color:#111827; background:var(--accent);
+      padding:2px 8px; border-radius:999px; font-weight:700;
+    }
+    .sub{color:var(--muted); font-size:13px}
+    .controls{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .control{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:10px 12px;
+      display:flex; gap:8px; align-items:center;
+      min-width:220px;
+    }
+    .control input, .control select{
+      width:100%;
+      border:0;
+      outline:none;
+      background:transparent;
+      color:var(--text);
+      font-size:14px;
+    }
+    .control select{appearance:none}
+    .btn{
+      background:linear-gradient(180deg, #1f2937, #111827);
+      border:1px solid var(--line);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .btn:hover{border-color:#334155}
+    main{padding:16px}
+    .card{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(17,24,39,.9), rgba(15,23,42,.9));
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .meta{
+      padding:12px 14px;
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      border-bottom:1px solid var(--line);
+      color:var(--muted);
+      font-size:13px;
+    }
+    .meta strong{color:var(--text)}
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+    }
+    thead th{
+      text-align:left;
+      padding:12px 14px;
+      color:#cbd5e1;
+      background:rgba(2,6,23,.35);
+      border-bottom:1px solid var(--line);
+      position:sticky; top:78px; /* sits under header */
+      z-index:2;
+      cursor:pointer;
+      user-select:none;
+    }
+    thead th small{color:var(--muted); font-weight:500}
+    tbody td{
+      padding:12px 14px;
+      border-bottom:1px solid rgba(36,48,67,.6);
+      vertical-align:middle;
+    }
+    tbody tr:hover{background:rgba(96,165,250,.06)}
+    .rank{
+      font-variant-numeric: tabular-nums;
+      color:#e2e8f0;
+      font-weight:800;
+    }
+    .name{
+      font-weight:800;
+      display:flex; align-items:center; gap:10px;
+    }
+    .badge{
+      font-size:12px;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      color:#cbd5e1;
+      background:rgba(15,23,42,.6);
+      white-space:nowrap;
+    }
+    .pos{color:#e2e8f0; font-weight:700}
+    .school{color:#d1d5db}
+    .grade{
+      font-weight:900;
+      color:var(--good);
+      font-variant-numeric: tabular-nums;
+    }
+    .notes{color:var(--muted)}
+    .footer{
+      padding:14px;
+      color:var(--muted);
+      font-size:12px;
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      border-top:1px solid var(--line);
+      background:rgba(2,6,23,.25);
+    }
+    .link{
+      color:var(--accent2);
+      text-decoration:none;
+    }
+    .link:hover{text-decoration:underline}
+    @media (max-width:700px){
+      thead th{top:112px}
+      .control{min-width:100%}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <h1>JP Big Board <span class="pill">BEST AVAILABLE</span></h1>
+        <div class="sub">Sortable, searchable big board — ESPN-style layout</div>
+      </div>
+
+      <div class="controls">
+        <div class="control" title="Search by name, position, school">
+          🔎
+          <input id="search" placeholder="Search player, school, position…" autocomplete="off"/>
+        </div>
+
+        <div class="control" title="Filter by position">
+          🏷️
+          <select id="posFilter">
+            <option value="ALL">All positions</option>
+          </select>
+        </div>
+
+        <button class="btn" id="resetBtn" title="Reset filters">Reset</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="card">
+    <div class="meta">
+      <div><strong id="count">0</strong> players shown</div>
+      <div>Tip: click a column header to sort</div>
+    </div>
+
+    <div style="overflow:auto;">
+      <table id="board">
+        <thead>
+          <tr>
+            <th data-key="rank">Rank <small>↑↓</small></th>
+            <th data-key="name">Player <small>↑↓</small></th>
+            <th data-key="pos">Pos <small>↑↓</small></th>
+            <th data-key="school">School <small>↑↓</small></th>
+            <th data-key="grade">Grade <small>↑↓</small></th>
+            <th data-key="notes">Notes <small>↑↓</small></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="footer">
+      <div>Made for JP • You can edit players inside <code>players</code> array.</div>
+      <div><a class="link" href="#" onclick="downloadJSON();return false;">Export current list (JSON)</a></div>
+    </div>
+  </div>
+</main>
+
+<script>
+  // ✅ EDIT YOUR BOARD HERE
+  // If you don’t want grades/notes yet, leave grade as "" and notes as ""
+  const players = [
+    { rank: 1,  name: "Caleb Downs",              pos: "S",    school: "OSU",        grade: "", notes: "" },
+    { rank: 2,  name: "David Bailey",             pos: "EDGE", school: "TexasT",     grade: "", notes: "" },
+    { rank: 3,  name: "Fernando Mendoza",         pos: "QB",   school: "Indiana",    grade: "", notes: "" },
+    { rank: 4,  name: "Jeremiyah Love",           pos: "RB",   school: "ND",         grade: "", notes: "" },
+    { rank: 5,  name: "Arvell Reese",             pos: "LB/EDGE", school: "OSU",     grade: "", notes: "" },
+    { rank: 6,  name: "Jordyn Tyson",             pos: "WR",   school: "ASU",        grade: "", notes: "" },
+    { rank: 7,  name: "Sonny Styles",             pos: "LB",   school: "OSU",        grade: "", notes: "" },
+    { rank: 8,  name: "Mansoor Delane",           pos: "CB",   school: "LSU",        grade: "", notes: "" },
+    { rank: 9,  name: "Rueben Bain",              pos: "EDGE", school: "Miami",      grade: "", notes: "" },
+    { rank: 10, name: "Peter Woods",              pos: "DT",   school: "Clemson",    grade: "", notes: "" },
+    { rank: 11, name: "Makai Lemon",              pos: "WR",   school: "USC",        grade: "", notes: "" },
+    { rank: 12, name: "Francis Mauigoa",          pos: "OT/G", school: "Miami",      grade: "", notes: "" },
+    { rank: 13, name: "Jermod McCoy",             pos: "CB",   school: "Tennessee",  grade: "", notes: "" },
+    { rank: 14, name: "Spencer Fano",             pos: "OT/G", school: "Utah",       grade: "", notes: "" },
+    { rank: 15, name: "Carnell Tate",             pos: "WR",   school: "OSU",        grade: "", notes: "" },
+    { rank: 16, name: "Olaivega Ioane",           pos: "G",    school: "PSU",        grade: "", notes: "" },
+    { rank: 17, name: "Kenyon Sadiq",             pos: "TE",   school: "Oregon",     grade: "", notes: "" },
+    { rank: 18, name: "Caleb Banks",              pos: "DT",   school: "Florida",    grade: "", notes: "" },
+    { rank: 19, name: "Avieon Terrell",           pos: "CB",   school: "Clemson",    grade: "", notes: "" },
+    { rank: 20, name: "CJ Allen",                 pos: "LB",   school: "Georgia",    grade: "", notes: "" },
+    { rank: 21, name: "Emmanuel McNeil-Warren",   pos: "S",    school: "Toledo",     grade: "", notes: "" },
+    { rank: 22, name: "Ty Simpson",               pos: "QB",   school: "Alabama",    grade: "", notes: "" },
+    { rank: 23, name: "TJ Parker",                pos: "EDGE", school: "Clemson",    grade: "", notes: "" },
+    { rank: 24, name: "KC Concepcion",            pos: "WR",   school: "Texas A&M",  grade: "", notes: "" },
+    { rank: 25, name: "Monroe Freeling",          pos: "T",    school: "Georgia",    grade: "", notes: "" },
+    { rank: 26, name: "Kadyn Proctor",            pos: "T",    school: "Alabama",    grade: "", notes: "" },
+    { rank: 27, name: "Cashius Howell",           pos: "EDGE", school: "Texas A&M",  grade: "", notes: "" },
+    { rank: 28, name: "Dillion Thieneman",        pos: "S",    school: "Oregon",     grade: "", notes: "" },
+    { rank: 29, name: "Akheem Mesidor",           pos: "EDGE", school: "Miami",      grade: "", notes: "" },
+    { rank: 30, name: "Eli Stowers",              pos: "TE",   school: "Vanderbilt", grade: "", notes: "" },
+    { rank: 31, name: "Kayden McDonald",          pos: "DT",   school: "OSU",        grade: "", notes: "" },
+    { rank: 32, name: "Omar Cooper",              pos: "WR",   school: "Indiana",    grade: "", notes: "" },
+  ];
+
+  const tbody = document.querySelector("#board tbody");
+  const searchEl = document.getElementById("search");
+  const posFilter = document.getElementById("posFilter");
+  const countEl = document.getElementById("count");
+  const resetBtn = document.getElementById("resetBtn");
+  const headers = document.querySelectorAll("thead th");
+
+  let sortKey = "rank";
+  let sortDir = "asc";
+
+  function uniq(arr){ return [...new Set(arr)].sort(); }
+
+  function normalize(s){ return (s ?? "").toString().toLowerCase().trim(); }
+
+  function buildPosOptions(){
+    const positions = uniq(players.map(p => p.pos));
+    positions.forEach(pos => {
+      const opt = document.createElement("option");
+      opt.value = pos;
+      opt.textContent = pos;
+      posFilter.appendChild(opt);
+    });
+  }
+
+  function compare(a,b,key){
+    const va = a[key], vb = b[key];
+    const na = Number(va), nb = Number(vb);
+
+    // numeric sort if possible
+    if (!Number.isNaN(na) && !Number.isNaN(nb) && (va !== "" && vb !== "")) {
+      return na - nb;
+    }
+
+    // fallback string sort
+    return (va ?? "").toString().localeCompare((vb ?? "").toString(), undefined, {numeric:true, sensitivity:"base"});
+  }
+
+  function getFiltered(){
+    const q = normalize(searchEl.value);
+    const pos = posFilter.value;
+
+    return players.filter(p => {
+      const matchesPos = (pos === "ALL") ? true : p.pos === pos;
+      const hay = normalize(`${p.rank} ${p.name} ${p.pos} ${p.school} ${p.grade} ${p.notes}`);
+      const matchesSearch = q ? hay.includes(q) : true;
+      return matchesPos && matchesSearch;
+    });
+  }
+
+  function render(){
+    const rows = getFiltered()
+      .slice()
+      .sort((a,b) => {
+        const c = compare(a,b,sortKey);
+        return sortDir === "asc" ? c : -c;
+      });
+
+    tbody.innerHTML = "";
+    rows.forEach(p => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="rank">${p.rank}</td>
+        <td class="name">
+          ${p.name}
+          <span class="badge">#${p.rank}</span>
+        </td>
+        <td class="pos">${p.pos}</td>
+        <td class="school">${p.school}</td>
+        <td class="grade">${p.grade || "—"}</td>
+        <td class="notes">${p.notes || "—"}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    countEl.textContent = rows.length;
+  }
+
+  headers.forEach(th => {
+    th.addEventListener("click", () => {
+      const key = th.dataset.key;
+      if (!key) return;
+      if (sortKey === key) {
+        sortDir = (sortDir === "asc") ? "desc" : "asc";
+      } else {
+        sortKey = key;
+        sortDir = "asc";
+      }
+      render();
+    });
+  });
+
+  searchEl.addEventListener("input", render);
+  posFilter.addEventListener("change", render);
+  resetBtn.addEventListener("click", () => {
+    searchEl.value = "";
+    posFilter.value = "ALL";
+    sortKey = "rank";
+    sortDir = "asc";
+    render();
+  });
+
+  // Export function (optional)
+  function downloadJSON(){
+    const data = getFiltered();
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "jp-big-board.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+  window.downloadJSON = downloadJSON;
+
+  buildPosOptions();
+  render();
+</script>
+</body>
+</html>
